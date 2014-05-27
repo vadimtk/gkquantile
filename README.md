@@ -12,7 +12,7 @@ http://www.mathcs.emory.edu/~cheung/Courses/584-StreamDB/Syllabus/08-Quantile/Gr
 How to use
 ============
 
-	tt := gkquantile.NewGKSummary(0.025)
+	tt := gkquantile.NewGKSummary(0.025) // where 0.025 is an accuracy. Smaller value gives a better accuracy, but will require more storage 
 	tt.Add(value) // add as much values as you want
 	tt.Query(0.95) - receive 0.95 quantile
 	tt.Query(0.50) - receive 0.50 quantile (median)
