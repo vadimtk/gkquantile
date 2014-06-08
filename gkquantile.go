@@ -124,18 +124,46 @@ func (t *GKSummary) Compress() {
 }
 
 func (t *GKSummary) Query(q float64) float64 {
-    rankMin := 0
-    desired := int(q * (float64(t.count)))
-    for i := 1; i < len(t.Items); i++ {
-        prev := t.Items[i-1]
-        curr := t.Items[i]
-        rankMin += prev.g
-        if rankMin+curr.g+curr.delta > desired+int(t.epsilon*float64(t.count)) {
-            return prev.value
-        }
-    }
-    return t.Items[len(t.Items)-1].value
+rankMin := 0
+		 if q==0 {
+			 return t.Items[0].value
+		 }
+	 if q==1 {
+		 return t.Items[len(t.Items)-1].value
+	 }
+desired := int(q * (float64(t.count)))
+		 for i := 1; i < len(t.Items); i++ {
+prev := t.Items[i-1]
+	      curr := t.Items[i]
+	      rankMin += prev.g
+	      if rankMin+curr.g+curr.delta > desired+int(t.epsilon*float64(t.count)) {
+		      return prev.value
+	      }
+		 }
+	 return t.Items[len(t.Items)-1].value
 }
+
+func (t *GKSummary) QueryRank(q float64) (float64, int, int) {
+rankMin := 0
+		 if q==0 {
+			 return t.Items[0].value, t.Items[0].g, t.Items[0].g+t.Items[0].delta
+		 }
+
+desired := int(q * (float64(t.count)))
+
+		 for i := 1; i < len(t.Items); i++ {
+	prev := t.Items[i-1]
+	      curr := t.Items[i]
+	      rankMin += prev.g
+	      if rankMin+curr.g+curr.delta > desired+int(t.epsilon*float64(t.count)) {
+		      return prev.value, rankMin, rankMin + prev.delta
+	      }
+		 }
+	 return t.Items[len(t.Items)-1].value, rankMin+t.Items[len(t.Items)-1].g, rankMin+t.Items[len(t.Items)-1].g+t.Items[len(t.Items)-1].delta
+}
+
+
+
 
 func (t *GKSummary) Print() {
     rank := 0
