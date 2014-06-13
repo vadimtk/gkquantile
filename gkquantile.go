@@ -162,6 +162,35 @@ func (t *GKSummary) QueryRank(q float64) (float64, int, int) {
 	return t.Items[len(t.Items)-1].value, rankMin + t.Items[len(t.Items)-1].g, rankMin + t.Items[len(t.Items)-1].g + t.Items[len(t.Items)-1].delta
 }
 
+/* Build histogram */
+func (t *GKSummary) Histo(bins int) float64 {
+	// difference between Min and Max
+	maxRange := t.Query(0.95)
+	width := maxRange - t.Items[0].value
+	step := width / float64(bins) 
+
+	rankMin := t.Items[0].g
+	prevRank := 0
+	i:=1
+	for j := t.Items[0].value+step ; j <= maxRange; j += step {
+		fmt.Printf("step %f, ",j)
+		for t.Items[i].value <= j {
+			rankMin += t.Items[i].g	
+			i += 1
+		}
+		fmt.Printf("rank: %d\n",rankMin-prevRank)
+		prevRank = rankMin
+	}
+	
+	for ; i < len(t.Items); i++ {
+		rankMin += t.Items[i].g
+	}
+	
+	fmt.Printf("max rank: %d\n ", rankMin - prevRank)
+	return 0.0
+}
+
+
 func (t *GKSummary) Print() {
 	rank := 0
 	for i, v := range t.Items { // loop through all values
